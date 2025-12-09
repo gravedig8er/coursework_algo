@@ -3,6 +3,7 @@ package algo;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Pupok");
-        System.out.println("дамир лох");
+        System.out.println("сама такая");
+        System.out.println("Hello");
     }
 }
