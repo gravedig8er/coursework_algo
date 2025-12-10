@@ -1,15 +1,17 @@
 package algo;
 
+import algo.map.MyHashMap;
+
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Pupok");
-        System.out.println("сама такая");
-        System.out.println("Hello");
+        MyHashMap<String, Integer> map = new MyHashMap<>();
+        ArrayList<Integer> arrayList = new ArrayList<>();
+
+        arrayList.add(1);
+        System.out.println(arrayList.remove(Integer.valueOf(1)));
 
 
-        System.out.println("asdasdasd");
-
-
-        System.out.println("Abobo");
     }
 }
