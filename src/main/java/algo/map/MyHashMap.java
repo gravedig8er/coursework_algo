@@ -1,45 +1,63 @@
 package algo.map;
 
-public class MyHashMap<T, V> implements IMap<T, V>{
+public class MyHashMap<K, V> implements IMap<K, V>{
 
-    private static class Entity<T, V> { // КЛАСС-СУЩНОСТЬ ОДНОГО ЭЛЕМЕНТА МАССИВА
-        T key;
+    private static class Entity<K, V> { // КЛАСС-СУЩНОСТЬ ОДНОГО ЭЛЕМЕНТА МАССИВА
+        K key;
         V value;
         boolean isDeleted;
 
-        Entity(T key, V value) {
+        Entity(K key, V value) {
             this.key = key;
             this.value = value;
         }
     }
 
-    private Entity<T, V>[] table;
+    private Entity<K, V>[] table;
     private int size; // реальное кол-во элементов
     private int capacity; // размер таблицы
-    private double trashHold; // при каком кэфе происходит ресайз 0.75
+    private double tresHold; // при каком кэфе происходит ресайз 0.75
 
     public MyHashMap() {
         this.capacity = 10;
-        this.table = (Entity<T, V>[]) new Entity[capacity];
+        this.table = (Entity<K, V>[]) new Entity[capacity];
     }
 
     @Override
-    public void insert(T key, V value) {
+    public void insert(K key, V value) {
         return;
     }
 
     @Override
-    public V search(T key) {
+    public V get(K key) {
         return null;
     }
 
     @Override
-    public V delete(T key) {
-        return null;
-    }
-
-    @Override
-    public boolean contains(T key) {
+    public boolean containsKey(K key) {
         return false;
     }
+
+    @Override
+    public V delete(K key) {
+        return null;
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    private void resize() {
+
+    }
+
+    private int hash(K key) {
+        return 0;
+    }
+
+        private int getIndex(int hash, int step) {
+        return 0;
+    }
+
 }
