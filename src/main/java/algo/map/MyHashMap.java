@@ -1,5 +1,7 @@
 package algo.map;
 
+import com.sun.source.tree.BreakTree;
+
 import java.util.Iterator;
 
 public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K, V>> {
@@ -12,6 +14,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
         Entity(K key, V value) {
             this.key = key;
             this.value = value;
+            this.isDeleted = false;
         }
     }
 
@@ -41,7 +44,8 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     private Entity<K, V>[] table;
     private int size; // реальное кол-во элементов
     private int capacity; // размер таблицы
-    private double tresHold; // при каком кэфе происходит ресайз 0.75
+    private final double tresHold = 0.5; // при каком кэфе происходит ресайз 0.5; для вставки
+    private final boolean probWay = false; // false => linear; true => quadratic
 
     public MyHashMap() {
         this.capacity = 10;
@@ -55,11 +59,42 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public V get(K key) {
-        return null;
+        int indexArr = hash(key) % capacity;
+        Entity<K, V> entity = table[indexArr];
+
+        if (entity == null || entity.isDeleted) return null;
+
+        if (entity.key == key) {
+            return entity.value;
+        }
+        else {
+            if (probWay) {
+                //return quadraticProb(key, indexArr);
+                return null;
+            }
+            else {
+                int tmpIndex = linearProb(key, indexArr);
+                if (tmpIndex != -1) {
+                    return table[linearProb(key, indexArr)].value;
+                }
+                return null;
+            }
+        }
+    }
+
+    public int linearProb(K key, int indexArr) {
+        for (int i = indexArr + 1; i < table.length; ++i) {
+            if (table[i].key == key && table[i] != null  && !table[i].isDeleted) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public boolean containsKey(K key) {
+
+
         return false;
     }
 
@@ -75,6 +110,13 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
         entry.value = null; // ни в коем случае не зануляем ключ
         size--;
         return value;
+    }
+
+    private Entity<K, V> findEntity(K key) {
+
+
+
+        return null;
     }
 
     @Override
