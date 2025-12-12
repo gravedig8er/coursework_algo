@@ -8,4 +8,5 @@ public interface IMap<T, V> {
     V search(T key);
     V delete(T key);
     boolean contains(T key);
+
 }
