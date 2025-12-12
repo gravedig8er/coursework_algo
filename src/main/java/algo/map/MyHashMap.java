@@ -1,8 +1,10 @@
 package algo.map;
 
-public class MyHashMap<K, V> implements IMap<K, V>{
+import java.util.Iterator;
 
-    private static class Entity<K, V> { // КЛАСС-СУЩНОСТЬ ОДНОГО ЭЛЕМЕНТА МАССИВА
+public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K, V>> {
+
+    public static class Entity<K, V> { // КЛАСС-СУЩНОСТЬ ОДНОГО ЭЛЕМЕНТА МАССИВА
         K key;
         V value;
         boolean isDeleted;
@@ -10,6 +12,29 @@ public class MyHashMap<K, V> implements IMap<K, V>{
         Entity(K key, V value) {
             this.key = key;
             this.value = value;
+        }
+    }
+
+    private class MyIterator implements Iterator<Entity<K, V>> {
+        private int currentIndex = 0;
+
+        @Override
+        public boolean hasNext() {
+            while (currentIndex < capacity) {
+                if (table[currentIndex] != null && !table[currentIndex].isDeleted) {
+                    return true;
+                }
+                currentIndex++;
+            }
+            return  false;
+        }
+
+        @Override
+        public Entity<K, V> next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException();
+            }
+            return table[currentIndex++];
         }
     }
 
@@ -40,24 +65,43 @@ public class MyHashMap<K, V> implements IMap<K, V>{
 
     @Override
     public V delete(K key) {
-        return null;
+        Entity<K, V> entry = findEntity(key); // вернет объект или null TODO: ДАМИР, ПРОВЕРЬ ФУНКЦИИ ПРОБИРОВАНИЯ, НУЖНО ВОЗВРАЩАТЬ ССЫЛКУ НА ОРИГУ
+    // смотри чтобы мы в ней могли выбрать по флагу например какой-то способ пробирования!!! (сделать отдельную переменную в классе, которая обозначает пробирование)
+
+        if (entry == null || entry.isDeleted) return null;
+        V value = entry.value;
+
+        entry.isDeleted = true;
+        entry.value = null; // ни в коем случае не зануляем ключ
+        size--;
+        return value;
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
-    private void resize() {
+    private void resize() { // функция для обновления размерности
+        Entity<K, V>[] oldTable = this.table; // сохраняем для копирования
 
+        capacity *= 2;
+        table = (Entity<K, V>[]) new Entity[capacity];
+
+        size = 0;
+        for (Entity<K, V> oldEntry: oldTable) {
+            if (oldEntry != null && !oldEntry.isDeleted) {
+                insert(oldEntry.key, oldEntry.value);
+            }
+        }
     }
 
     private int hash(K key) {
-        return 0;
+        return Math.abs(key.hashCode());
     }
 
-        private int getIndex(int hash, int step) {
-        return 0;
+    @Override
+    public Iterator<Entity<K, V>> iterator() {
+        return new MyIterator();
     }
-
 }
