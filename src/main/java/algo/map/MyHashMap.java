@@ -54,6 +54,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public void insert(K key, V value) {
+
         return;
     }
 
@@ -82,6 +83,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
         }
     }
 
+    // возвращает индекс подходящей ячейки или -1 если не нашлось
     public int linearProb(K key, int indexArr) {
         for (int i = indexArr + 1; i < table.length; ++i) {
             if (table[i].key == key && table[i] != null  && !table[i].isDeleted) {
@@ -93,9 +95,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public boolean containsKey(K key) {
-
-
-        return false;
+        return (get(key) != null);
     }
 
     @Override
@@ -113,10 +113,27 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private Entity<K, V> findEntity(K key) {
+        int indexArr = hash(key) % capacity;
+        Entity<K, V> entity = table[indexArr];
 
+        if (entity == null || entity.isDeleted) return null;
 
-
-        return null;
+        if (entity.key == key) {
+            return entity;
+        }
+        else {
+            if (probWay) {
+                //return quadraticProb(key, indexArr);
+                return null;
+            }
+            else {
+                int tmpIndex = linearProb(key, indexArr);
+                if (tmpIndex != -1) {
+                    return table[linearProb(key, indexArr)];
+                }
+                return null;
+            }
+        }
     }
 
     @Override
