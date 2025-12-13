@@ -60,34 +60,21 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public V get(K key) {
-        int indexArr = hash(key) % capacity;
-        Entity<K, V> entity = table[indexArr];
-
-        if (entity == null || entity.isDeleted) return null;
-
-        if (entity.key == key) {
-            return entity.value;
-        }
-        else {
-            if (probWay) {
-                //return quadraticProb(key, indexArr);
-                return null;
-            }
-            else {
-                int tmpIndex = linearProb(key, indexArr);
-                if (tmpIndex != -1) {
-                    return table[linearProb(key, indexArr)].value;
-                }
-                return null;
-            }
-        }
+        Entity<K, V> entity = findEntity(key);
+        return ((entity != null) ? entity.value : null);
     }
 
     // возвращает индекс подходящей ячейки или -1 если не нашлось
     public int linearProb(K key, int indexArr) {
-        for (int i = indexArr + 1; i < table.length; ++i) {
-            if (table[i].key == key && table[i] != null  && !table[i].isDeleted) {
-                return i;
+        for (int i = 1; i < capacity; ++i) {
+            int tmp = (indexArr + i) % capacity; // вот тут это обязательно нужно, потому что наша мапа кольцевая
+                                          // и надо проверить как после indexArr, так и до
+            if (table[tmp] == null) {
+                return -1;
+            }
+
+            if (table[tmp].key.equals(key) && !table[tmp].isDeleted) {
+                return tmp;
             }
         }
         return -1;
@@ -95,7 +82,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public boolean containsKey(K key) {
-        return (get(key) != null);
+        return (findEntity(key) != null);
     }
 
     @Override
@@ -116,9 +103,9 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
         int indexArr = hash(key) % capacity;
         Entity<K, V> entity = table[indexArr];
 
-        if (entity == null || entity.isDeleted) return null;
+        if (entity == null) return null;
 
-        if (entity.key == key) {
+        if (!entity.isDeleted && entity.key.equals(key)) {
             return entity;
         }
         else {
@@ -129,7 +116,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
             else {
                 int tmpIndex = linearProb(key, indexArr);
                 if (tmpIndex != -1) {
-                    return table[linearProb(key, indexArr)];
+                    return table[tmpIndex];
                 }
                 return null;
             }
