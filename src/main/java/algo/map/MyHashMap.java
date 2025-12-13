@@ -69,7 +69,19 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
             else { // <= тут если у меня элемент по начальному индексу удален или ключ другой (то есть коллизия возникла)
                 // ==> делаем пробирование
                 if (probWay) {
-                    //return quadraticProb(key, indexArr);
+                    int tmpIndex = quadraticProb(key, indexArr);
+                    if (tmpIndex == -1) {
+                        System.out.println("Мапа полностью заполнена");
+                        return;
+                    }
+                    else if (table[tmpIndex] == null || table[tmpIndex].isDeleted) {
+                        table[tmpIndex] = new Entity<>(key, value);
+                        size++;
+                    }
+                    else if (table[tmpIndex].key.equals(key)) {
+                        table[tmpIndex].value = value;
+                        return;
+                    }
                 }
                 else {
                     int tmpIndex = linearProb(key, indexArr);
@@ -100,7 +112,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     // возвращает индекс подходящей для операций ячейки или -1 если не нашлось
-    public int linearProb(K key, int indexArr) {
+    private int linearProb(K key, int indexArr) {
         int flagOfDel = -1;
         for (int i = 1; i < capacity; ++i) {
             int tmp = (indexArr + i) % capacity; // вот тут это обязательно нужно, потому что наша мапа кольцевая
@@ -124,6 +136,35 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
         // -1 может так-то в теории быть, но маловероятно, только если мапа наша заполниться полностью
         return -1;
     }
+
+    private int quadraticProb(K key, int indexArr) {
+        int flagOfDel = -1;
+        int c1 = 1;
+        int c2 = 1;
+        for (int i = 1; i < capacity; ++i) {
+            int tmp = (indexArr + c1 * i + c2 * i * i) % capacity; // вот тут это обязательно нужно, потому что наша мапа кольцевая
+            // и надо проверить как после indexArr, так и до
+            if (table[tmp] == null) {
+                if (flagOfDel != -1) {
+                    return flagOfDel;
+                }
+                return tmp;
+            }
+
+            if (table[tmp].isDeleted) {
+                flagOfDel = ((flagOfDel == -1) ? tmp : flagOfDel);
+                continue;
+            }
+
+            if (table[tmp].key.equals(key)) {
+                return tmp;
+            }
+        }
+        // -1 может так-то в теории быть, но маловероятно, только если мапа наша заполниться полностью
+        return -1;
+    }
+
+
 
     @Override
     public boolean containsKey(K key) {
@@ -155,7 +196,14 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
         }
         else {
             if (probWay) {
-                //return quadraticProb(key, indexArr);
+                int tmpIndex = quadraticProb(key, indexArr);
+                if (tmpIndex == -1) {
+                    System.out.println("Мапа переполнена");
+                    return null;
+                }
+                else if (table[tmpIndex] != null && !table[tmpIndex].isDeleted) {
+                    return table[tmpIndex];
+                }
                 return null;
             }
             else {
