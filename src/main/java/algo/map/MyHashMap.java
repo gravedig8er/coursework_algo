@@ -16,6 +16,14 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
             this.value = value;
             this.isDeleted = false;
         }
+
+        public V getValue() {
+            return value;
+        }
+
+        public K getKey() {
+            return key;
+        }
     }
 
     private class MyIterator implements Iterator<Entity<K, V>> {
@@ -139,8 +147,13 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private int hash(K key) {
-        return Math.abs(key.hashCode());
+        int k = Math.abs(key.hashCode()); // Берем сырой хеш
+        double A = (Math.sqrt(5) - 1) / 2; // Золотое сечение
+
+        // Магия Кнута: превращаем сырой хеш в идеальный индекс
+        return (int) Math.floor(capacity * ((k * A) % 1));
     }
+
 
     @Override
     public Iterator<Entity<K, V>> iterator() {
