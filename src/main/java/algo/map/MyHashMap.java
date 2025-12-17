@@ -50,7 +50,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private Entity<K, V>[] table;
-    private int size; // реальное кол-во элементов
+    private int size; // реальное кол-во элементов, у которых isDeleted = false!!!!!!
     private int capacity; // размер таблицы
     private final double tresHold = 0.5; // при каком кэфе происходит ресайз 0.5; для вставки
     private final boolean probWay = false; // false => linear; true => quadratic
@@ -62,48 +62,121 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public void insert(K key, V value) {
-        return;
+        int indexArr = hash(key) % capacity;
+        Entity<K, V> item = table[indexArr];
+        if (item == null || item.isDeleted) { // <= тут проверили просто на null начальный индекс/isDeleted == true
+            table[indexArr] = new Entity<>(key, value); // если null, то просто новый айтем кидаем в Arr
+            size++;
+        }
+        else {
+            if (item.key.equals(key)) { // <= тут проверяем дальше: если по индексу начальному айтем
+                // не удален и ключ совпал то просто value меняем
+                item.value = value;
+                return;
+            }
+            else { // <= тут если у меня элемент по начальному индексу удален или ключ другой (то есть коллизия возникла)
+                // ==> делаем пробирование
+                if (probWay) {
+                    int tmpIndex = quadraticProb(key, indexArr);
+                    if (tmpIndex == -1) {
+                        System.out.println("Мапа полностью заполнена");
+                        return;
+                    }
+                    else if (table[tmpIndex] == null || table[tmpIndex].isDeleted) {
+                        table[tmpIndex] = new Entity<>(key, value);
+                        size++;
+                    }
+                    else if (table[tmpIndex].key.equals(key)) {
+                        table[tmpIndex].value = value;
+                        return;
+                    }
+                }
+                else {
+                    int tmpIndex = linearProb(key, indexArr);
+                    if (tmpIndex == -1) {
+                        System.out.println("Мапа полностью заполнена");
+                        return;
+                    }
+                    else if (table[tmpIndex] == null || table[tmpIndex].isDeleted) {
+                        table[tmpIndex] = new Entity<>(key, value);
+                        size++;
+                    }
+                    else if (table[tmpIndex].key.equals(key)) {
+                        table[tmpIndex].value = value;
+                        return;
+                    }
+                }
+            }
+        }
+        if (size / (double) capacity >= tresHold) { // <= ну тут просто ресайзим если коэф переполнения достиг своей планки
+            resize();
+        }
     }
 
     @Override
     public V get(K key) {
-        int indexArr = hash(key) % capacity;
-        Entity<K, V> entity = table[indexArr];
-
-        if (entity == null || entity.isDeleted) return null;
-
-        if (entity.key == key) {
-            return entity.value;
-        }
-        else {
-            if (probWay) {
-                //return quadraticProb(key, indexArr);
-                return null;
-            }
-            else {
-                int tmpIndex = linearProb(key, indexArr);
-                if (tmpIndex != -1) {
-                    return table[linearProb(key, indexArr)].value;
-                }
-                return null;
-            }
-        }
+        Entity<K, V> entity = findEntity(key);
+        return ((entity != null) ? entity.value : null);
     }
 
-    public int linearProb(K key, int indexArr) {
-        for (int i = indexArr + 1; i < table.length; ++i) {
-            if (table[i].key == key && table[i] != null  && !table[i].isDeleted) {
-                return i;
+    // возвращает индекс подходящей для операций ячейки или -1 если не нашлось
+    private int linearProb(K key, int indexArr) {
+        int flagOfDel = -1;
+        for (int i = 1; i < capacity; ++i) {
+            int tmp = (indexArr + i) % capacity; // вот тут это обязательно нужно, потому что наша мапа кольцевая
+                                          // и надо проверить как после indexArr, так и до
+            if (table[tmp] == null) {
+                if (flagOfDel != -1) {
+                    return flagOfDel;
+                }
+                return tmp;
+            }
+
+            if (table[tmp].isDeleted) {
+                flagOfDel = ((flagOfDel == -1) ? tmp : flagOfDel);
+                continue;
+            }
+
+            if (table[tmp].key.equals(key)) {
+                return tmp;
             }
         }
+        // -1 может так-то в теории быть, но маловероятно, только если мапа наша заполниться полностью
         return -1;
     }
 
+    private int quadraticProb(K key, int indexArr) {
+        int flagOfDel = -1;
+        int c1 = 1;
+        int c2 = 1;
+        for (int i = 1; i < capacity; ++i) {
+            int tmp = (indexArr + c1 * i + c2 * i * i) % capacity; // вот тут это обязательно нужно, потому что наша мапа кольцевая
+            // и надо проверить как после indexArr, так и до
+            if (table[tmp] == null) {
+                if (flagOfDel != -1) {
+                    return flagOfDel;
+                }
+                return tmp;
+            }
+
+            if (table[tmp].isDeleted) {
+                flagOfDel = ((flagOfDel == -1) ? tmp : flagOfDel);
+                continue;
+            }
+
+            if (table[tmp].key.equals(key)) {
+                return tmp;
+            }
+        }
+        // -1 может так-то в теории быть, но маловероятно, только если мапа наша заполниться полностью
+        return -1;
+    }
+
+
+
     @Override
     public boolean containsKey(K key) {
-
-
-        return false;
+        return (findEntity(key) != null);
     }
 
     @Override
@@ -121,10 +194,38 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private Entity<K, V> findEntity(K key) {
+        int indexArr = hash(key) % capacity;
+        Entity<K, V> entity = table[indexArr];
 
+        if (entity == null) return null;
 
-
-        return null;
+        if (!entity.isDeleted && entity.key.equals(key)) {
+            return entity;
+        }
+        else {
+            if (probWay) {
+                int tmpIndex = quadraticProb(key, indexArr);
+                if (tmpIndex == -1) {
+                    System.out.println("Мапа переполнена");
+                    return null;
+                }
+                else if (table[tmpIndex] != null && !table[tmpIndex].isDeleted) {
+                    return table[tmpIndex];
+                }
+                return null;
+            }
+            else {
+                int tmpIndex = linearProb(key, indexArr);
+                if (tmpIndex == -1) {
+                    System.out.println("Мапа переполнена");
+                    return null;
+                }
+                else if (table[tmpIndex] != null && !table[tmpIndex].isDeleted) {
+                    return table[tmpIndex];
+                }
+                return null;
+            }
+        }
     }
 
     @Override
