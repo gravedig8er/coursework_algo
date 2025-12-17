@@ -3,6 +3,7 @@ package algo.map;
 import com.sun.source.tree.BreakTree;
 
 import java.util.Iterator;
+import java.util.Map;
 
 public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K, V>> {
 
@@ -240,8 +241,11 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private int hash(K key) {
-        return Math.abs(key.hashCode());
+        int keyHash = Math.abs(key.hashCode());
+        double A = (Math.sqrt(5) - 1) / 2; // это коэф Дональда Кнута
+        return (int) Math.floor(capacity * ((keyHash * A) % 1));
     }
+
 
     @Override
     public Iterator<Entity<K, V>> iterator() {
