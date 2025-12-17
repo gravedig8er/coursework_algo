@@ -3,6 +3,7 @@ package algo.map;
 import com.sun.source.tree.BreakTree;
 
 import java.util.Iterator;
+import java.util.Map;
 
 public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K, V>> {
 
@@ -15,14 +16,6 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
             this.key = key;
             this.value = value;
             this.isDeleted = false;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        public K getKey() {
-            return key;
         }
     }
 
@@ -248,11 +241,9 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private int hash(K key) {
-        int k = Math.abs(key.hashCode()); // Берем сырой хеш
-        double A = (Math.sqrt(5) - 1) / 2; // Золотое сечение
-
-        // Магия Кнута: превращаем сырой хеш в идеальный индекс
-        return (int) Math.floor(capacity * ((k * A) % 1));
+        int keyHash = Math.abs(key.hashCode());
+        double A = (Math.sqrt(5) - 1) / 2; // это коэф Дональда Кнута
+        return (int) Math.floor(capacity * ((keyHash * A) % 1));
     }
 
 
