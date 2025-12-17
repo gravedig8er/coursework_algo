@@ -38,7 +38,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
                 }
                 currentIndex++;
             }
-            return  false;
+            return false;
         }
 
         @Override
@@ -118,6 +118,10 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     public V get(K key) {
         Entity<K, V> entity = findEntity(key);
         return ((entity != null) ? entity.value : null);
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     // возвращает индекс подходящей для операций ячейки или -1 если не нашлось
