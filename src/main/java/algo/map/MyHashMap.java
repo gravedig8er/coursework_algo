@@ -17,6 +17,14 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
             this.value = value;
             this.isDeleted = false;
         }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
     }
 
     private class MyIterator implements Iterator<Entity<K, V>> {
