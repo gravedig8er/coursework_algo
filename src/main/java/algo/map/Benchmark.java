@@ -13,7 +13,7 @@ public class Benchmark {
         System.out.println("Количество элементов: " + elementsCount);
         System.out.println("-------------------------------------");
 
-        runTest("Линейное пробирование", elementsCount);
+        runTest("пробирование", elementsCount);
 
     }
 
