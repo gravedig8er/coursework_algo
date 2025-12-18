@@ -13,11 +13,11 @@ public class Benchmark {
         System.out.println("Количество элементов: " + elementsCount);
         System.out.println("-------------------------------------");
 
-        runTest("Линейное пробирование", false, elementsCount);
+        runTest("пробирование", elementsCount);
 
     }
 
-    private static void runTest(String strategyName, boolean useQuadratic, int count) {
+    private static void runTest(String strategyName, int count) {
         MyHashMap<Integer, String> map = new MyHashMap<>();
         Random random = new Random(42);
 
