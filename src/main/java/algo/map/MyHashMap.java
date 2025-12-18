@@ -54,10 +54,11 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     private int size; // реальное кол-во элементов, у которых isDeleted = false!!!!!!
     private int capacity; // размер таблицы
     private final double tresHold = 0.5; // при каком кэфе происходит ресайз 0.5; для вставки
-    private final boolean probWay = false; // false => linear; true => quadratic
+    private final boolean probWay = true; // false => linear; true => quadratic
+    private long collisionCount = 0;
 
     public MyHashMap() {
-        this.capacity = 10;
+        this.capacity = 16;
         this.table = (Entity<K, V>[]) new Entity[capacity];
     }
 
@@ -77,6 +78,7 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
             }
             else { // <= тут если у меня элемент по начальному индексу удален или ключ другой (то есть коллизия возникла)
                 // ==> делаем пробирование
+                collisionCount++;
                 if (probWay) {
                     int tmpIndex = quadraticProb(key, indexArr);
                     if (tmpIndex == -1) {
@@ -258,5 +260,13 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     @Override
     public Iterator<Entity<K, V>> iterator() {
         return new MyIterator();
+    }
+
+    public long getCollisionCount() {
+        return collisionCount;
+    }
+
+    public void resetCollisionCount() {
+        collisionCount = 0;
     }
 }
