@@ -26,8 +26,8 @@ public class Main {
         System.out.println(map.getCapacity() + " capacity");
         System.out.println();
 
-        for (MyHashMap.Entity<Integer, Integer> stringIntegerEntity : map) {
-            System.out.println(stringIntegerEntity.getKey() + " " + stringIntegerEntity.getValue());
+        for (MyHashMap.Entity<Integer, Integer> temp : map) {
+            System.out.println(temp.getKey() + " " + temp.getValue());
         }
 
         System.out.println();
@@ -36,8 +36,8 @@ public class Main {
         map.delete(99);
         System.out.println(map.size() + " size");
         System.out.println();
-        for (MyHashMap.Entity<Integer, Integer> stringIntegerEntity : map) {
-            System.out.println(stringIntegerEntity.getKey() + " " + stringIntegerEntity.getValue());
+        for (MyHashMap.Entity<Integer, Integer> temp : map) {
+            System.out.println(temp.getKey() + " " + temp.getValue());
         }
 
         System.out.println();
@@ -46,8 +46,8 @@ public class Main {
         System.out.println();
 
         map.insert(99, 111);
-        for (MyHashMap.Entity<Integer, Integer> stringIntegerEntity : map) {
-            System.out.println(stringIntegerEntity.getKey() + " " + stringIntegerEntity.getValue());
+        for (MyHashMap.Entity<Integer, Integer> temp : map) {
+            System.out.println(temp.getKey() + " " + temp.getValue());
         }
 
         System.out.println();
