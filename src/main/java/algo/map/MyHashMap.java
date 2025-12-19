@@ -64,7 +64,8 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
 
     @Override
     public void insert(K key, V value) {
-        int indexArr = hash(key) % capacity;
+        //int indexArr = hash(key) % capacity;
+        int indexArr = hash(key);
         Entity<K, V> item = table[indexArr];
         if (item == null || item.isDeleted) { // <= тут проверили просто на null начальный индекс/isDeleted == true
             table[indexArr] = new Entity<>(key, value); // если null, то просто новый айтем кидаем в Arr
@@ -201,7 +202,8 @@ public class MyHashMap<K, V> implements IMap<K, V>, Iterable<MyHashMap.Entity<K,
     }
 
     private Entity<K, V> findEntity(K key) {
-        int indexArr = hash(key) % capacity;
+        //int indexArr = hash(key) % capacity;
+        int indexArr = hash(key);
         Entity<K, V> entity = table[indexArr];
 
         if (entity == null) return null;
